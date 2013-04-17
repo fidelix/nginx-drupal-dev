@@ -1,0 +1,41 @@
+server {
+  listen 80 default_server;
+  server_name .dev .stage;
+
+	set $basedir /www;
+	set $domain $host;
+  if ($domain ~ "([^.]+)\.dev$") {
+    set $dir $1;
+    set $env dev;
+  }
+	if ($domain ~ "([^.]+)\.stage$") {
+		set $dir $1;
+		set $env stage;
+	}
+
+  if (-d $basedir/$dir/drupal) {
+    set $path "${dir}/drupal";
+  }
+  if (-d $basedir/$dir/$env) {
+    set $path "${dir}/${env}";
+  }
+  if (-f $basedir/$dir/index.php) {
+    set $path $dir;
+  }
+  if (-f $basedir/$dir/index.html) {
+    set $path $dir;
+  }
+
+  root $basedir/$path;
+	autoindex on;
+
+	index index.html index.php;
+	fastcgi_keep_conn on; # keep alive to the FCGI upstream
+
+	include apps/drupal.conf;
+	include apps/php.conf;
+
+	## If you're using a module like search404 then 404's *have *to be handled by Drupal. Uncomment.
+  ## error_page 404 /index.php;
+
+}
