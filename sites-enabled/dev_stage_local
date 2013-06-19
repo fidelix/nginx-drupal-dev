@@ -1,15 +1,19 @@
 server {
     listen 80 default_server;
-    server_name .dev .stage .local;
+    server_name .dev .test .l;
     set $domain $host;
 
     if ($domain ~ "([^.]+)\.dev$") {
         set $dir $1;
         set $subdir dev;
     }
-    if ($domain ~ "([^.]+)\.stage$") {
+    if ($domain ~ "([^.]+)\.test$") {
         set $dir $1;
-        set $subdir stage;
+        set $subdir test;
+    }
+    if ($domain ~ "([^.]+)\.l$") {
+        set $dir $1;
+        set $subdir docroot;
     }
     if (-f $basedir/$dir/index.php) {
         set $path $dir;
@@ -20,8 +24,8 @@ server {
     if (-d $basedir/$dir/$subdir) {
         set $path "${dir}/${subdir}";
     }
-    if (-d $basedir/$dir/drupal) {
-        set $path "${dir}/drupal";
+    if (-d $basedir/$dir/docroot) {
+        set $path "${dir}/docroot";
     }
 
     root $basedir/$path;
